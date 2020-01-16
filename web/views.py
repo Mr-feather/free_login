@@ -39,6 +39,7 @@ class Admin(APIView):
     authentication_classes = (AdminAuth,)
 
     def get(self, request, *args, **kwargs):
+        print(request.user)
         return Response({'msg': 'success'}, status=status.HTTP_200_OK)
 
 
@@ -46,4 +47,5 @@ class APP(APIView):
     authentication_classes = (APPAuth,)
 
     def get(self, request, *args, **kwargs):
+        print(request.user)
         return Response({'msg': 'success'}, status=status.HTTP_200_OK)
