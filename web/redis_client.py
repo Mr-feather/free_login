@@ -2,7 +2,7 @@ import redis
 import os
 
 assert os.getenv('REDIS_HOST', '0.0.0.0:6379')
-pool = redis.ConnectionPool(host=os.getenv('REDIS_HOST'), port=6379, db=3)
+pool = redis.ConnectionPool(host=os.getenv('REDIS_HOST'), port=6379, db=3, password=123456)
 
 client = redis.Redis(connection_pool=pool)
 

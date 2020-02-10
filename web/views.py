@@ -2,6 +2,7 @@ from django.shortcuts import render
 
 # Create your views here.
 from rest_framework import status
+from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -38,8 +39,25 @@ class Login(APIView):
 class Admin(APIView):
     authentication_classes = (AdminAuth,)
 
+    def initialize_request(self, request, *args, **kwargs):
+        """
+        Returns the initial request object.
+        """
+        parser_context = self.get_parser_context(request)
+
+        return Request(
+            request,
+            parsers=self.get_parsers(),
+            authenticators=[APPAuth()] if request.method.lower() == "get" else [AdminAuth()],
+            negotiator=self.get_content_negotiator(),
+            parser_context=parser_context
+        )
+
     def get(self, request, *args, **kwargs):
         print(request.user)
+        return Response({'msg': 'success'}, status=status.HTTP_200_OK)
+
+    def post(self, request, *args, **kwargs):
         return Response({'msg': 'success'}, status=status.HTTP_200_OK)
 
 
