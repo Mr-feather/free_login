@@ -1,12 +1,15 @@
+from tracemalloc import BaseFilter
+
 from django.shortcuts import render
 
 # Create your views here.
-from rest_framework import status
+from rest_framework import status, mixins, viewsets
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from web.auth import AdminAuth, APPAuth
+from web.models import SS
 from web.redis_client import RedisClient
 
 
@@ -67,3 +70,29 @@ class APP(APIView):
     def get(self, request, *args, **kwargs):
         print(request.user)
         return Response({'msg': 'success'}, status=status.HTTP_200_OK)
+
+
+class BaseViewSet(mixins.CreateModelMixin,
+                  mixins.ListModelMixin,
+                  mixins.RetrieveModelMixin,
+                  mixins.UpdateModelMixin,
+                  viewsets.GenericViewSet):
+    """
+    后台管理使用
+    对于get方法取数的 ，后台和坐席端都要允许
+    """
+    permission_classes = []
+
+    def initialize_request(self, request, *args, **kwargs):
+        """
+        Returns the initial request object.
+        """
+        self.authentication_classes = [APPAuth] if request.method.lower() == "get" else [AdminAuth]
+        return super().initialize_request(request, args, kwargs)
+
+
+class DissentViewSet(BaseViewSet):
+    queryset = SS.objects.all()
+
+    def retrieve(self, request, *args, **kwargs):
+        return Response({'data': '123'})
